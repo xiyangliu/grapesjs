@@ -24531,12 +24531,10 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
     var guidesEl = this.guidesEl;
 
     if (!guidesEl) {
-      var _editor = this.editor,
+      var editor = this.editor,
           em = this.em,
           opts = this.opts;
-
-      var pfx = _editor.getConfig('stylePrefix');
-
+      var pfx = editor.getConfig('stylePrefix');
       var elInfoX = document.createElement('div');
       var elInfoY = document.createElement('div');
       var guideContent = "<div class=\"".concat(pfx, "guide-info__line ").concat(pfx, "danger-bg\">\n        <div class=\"").concat(pfx, "guide-info__content ").concat(pfx, "danger-color\"></div>\n      </div>");
@@ -24548,9 +24546,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
       elInfoY.innerHTML = guideContent;
       guidesEl.appendChild(elInfoX);
       guidesEl.appendChild(elInfoY);
-
-      _editor.Canvas.getToolsEl().appendChild(guidesEl);
-
+      editor.Canvas.getToolsEl().appendChild(guidesEl);
       this.guidesEl = guidesEl;
       this.elGuideInfoX = elInfoX;
       this.elGuideInfoY = elInfoY;
@@ -24583,6 +24579,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
     return this.getElementGuides(this.target.getEl());
   },
   updateGuides: function updateGuides(guides) {
+    var editor = this.editor;
     (guides || this.guides).forEach(function (item) {
       var origin = item.origin;
 
@@ -36857,7 +36854,7 @@ var defaultConfig = {
   editors: editors,
   plugins: plugins,
   // Will be replaced on build
-  version: '0.15.8',
+  version: '0.15.9',
 
   /**
    * Initialize the editor with passed options
