@@ -4,9 +4,9 @@
 	else if(typeof define === 'function' && define.amd)
 		define([], factory);
 	else if(typeof exports === 'object')
-		exports["grapesjs"] = factory();
+		exports["@wctsoft/grapesjs"] = factory();
 	else
-		root["grapesjs"] = factory();
+		root["@wctsoft/grapesjs"] = factory();
 })(window, function() {
 return /******/ (function(modules) { // webpackBootstrap
 /******/ 	// The module cache
@@ -28890,8 +28890,7 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
       var isObj = result && result.constructor === Object;
 
       if (result && result.length || isObj) {
-        this.clear(); // If the result is an object I consider it the wrapper
-
+        // If the result is an object I consider it the wrapper
         if (isObj) {
           this.getWrapper().set(result);
         } else {
@@ -36104,10 +36103,14 @@ var logs = {
 
     var clb = arguments.length > 0 && arguments[0] !== undefined ? arguments[0] : null;
     this.getCacheLoad(1, function (res) {
-      _this9.get('storables').forEach(function (module) {
+      var storables = _this9.get('storables');
+
+      storables.forEach(function (module) {
+        return module.clear && module.clear();
+      });
+      storables.forEach(function (module) {
         return module.load(res);
       });
-
       clb && clb(res);
     });
   },
@@ -36122,17 +36125,16 @@ var logs = {
   getCacheLoad: function getCacheLoad(force, clb) {
     var _this10 = this;
 
-    var f = force ? 1 : 0;
-    if (this.cacheLoad && !f) return this.cacheLoad;
+    if (this.cacheLoad && !force) return this.cacheLoad;
     var sm = this.get('StorageManager');
     var load = [];
     if (!sm) return {};
     this.get('storables').forEach(function (m) {
       var key = m.storageKey;
-      key = typeof key === 'function' ? key() : key;
-      var keys = key instanceof Array ? key : [key];
+      key = Object(underscore__WEBPACK_IMPORTED_MODULE_1__["isFunction"])(key) ? key() : key;
+      var keys = Object(underscore__WEBPACK_IMPORTED_MODULE_1__["isArray"])(key) ? key : [key];
       keys.forEach(function (k) {
-        load.push(k);
+        return load.push(k);
       });
     });
     sm.load(load, function (res) {
@@ -36140,7 +36142,7 @@ var logs = {
       clb && clb(res);
       setTimeout(function () {
         return _this10.trigger('storage:load', res);
-      }, 0);
+      });
     });
   },
 
@@ -36799,7 +36801,7 @@ var traitInputAttr = {
       // In a trait like select, these are used to translate option names
       options: {
         target: {
-          '': 'This window',
+          false: 'This window',
           _blank: 'New window'
         }
       }
@@ -36854,7 +36856,7 @@ var defaultConfig = {
   editors: editors,
   plugins: plugins,
   // Will be replaced on build
-  version: '0.15.10',
+  version: '0.15.12',
 
   /**
    * Initialize the editor with passed options
@@ -46990,7 +46992,7 @@ __webpack_require__.r(__webpack_exports__);
   appendTo: '',
   // Default options for the target input
   optionsTarget: [{
-    value: ''
+    value: false
   }, {
     value: '_blank'
   }]
@@ -47183,13 +47185,20 @@ function _objectSpread(target) { for (var i = 1; i < arguments.length; i++) { va
     var target = this.target;
     var name = this.get('name');
     if (Object(underscore__WEBPACK_IMPORTED_MODULE_2__["isUndefined"])(value)) return;
+    var valueToSet = value;
+
+    if (value === 'false') {
+      valueToSet = false;
+    } else if (value === 'true') {
+      valueToSet = true;
+    }
 
     if (this.get('changeProp')) {
-      target.set(name, value, opts);
+      target.set(name, valueToSet, opts);
     } else {
       var attrs = _objectSpread({}, target.get('attributes'));
 
-      attrs[name] = value;
+      attrs[name] = valueToSet;
       target.set('attributes', attrs, opts);
     }
   },
@@ -47648,7 +47657,7 @@ var $ = backbone__WEBPACK_IMPORTED_MODULE_0___default.a.$;
       });
       input += '</select>';
       this.$input = $(input);
-      var val = model.getTargetValue() || model.get('value');
+      var val = model.getTargetValue();
       !Object(underscore__WEBPACK_IMPORTED_MODULE_1__["isUndefined"])(val) && this.$input.val(val);
     }
 
@@ -51199,7 +51208,9 @@ function () {
       this.counter = 0;
       this.over = 0;
       dragStop && dragStop(cancel);
-      em.runDefault();
+      em.runDefault({
+        preserveSelected: 1
+      });
       em.trigger('canvas:dragend', ev);
     }
   }, {
